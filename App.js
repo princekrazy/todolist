@@ -1,14 +1,52 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  Keyboard
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function App() {
   const [task, setTask] = useState('');
   const [tasks, setTasks] = useState([]);
 
+  // Load tasks on app start
+  useEffect(() => {
+    const loadTasks = async () => {
+      try {
+        const savedTasks = await AsyncStorage.getItem('tasks');
+        if (savedTasks) {
+          setTasks(JSON.parse(savedTasks));
+        }
+      } catch (error) {
+        console.log('Error loading tasks:', error);
+      }
+    };
+    loadTasks();
+  }, []);
+
+  // Save tasks every time they change
+  useEffect(() => {
+    const saveTasks = async () => {
+      try {
+        await AsyncStorage.setItem('tasks', JSON.stringify(tasks));
+      } catch (error) {
+        console.log('Error saving tasks:', error);
+      }
+    };
+    saveTasks();
+  }, [tasks]);
+
   const addTask = () => {
     if (task.trim() === '') return;
-    setTasks([...tasks, { id: Date.now().toString(), title: task }]);
+    const newTask = { id: Date.now().toString(), title: task };
+    setTasks([...tasks, newTask]);
     setTask('');
+    Keyboard.dismiss();
   };
 
   const removeTask = (id) => {
@@ -17,7 +55,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Prince To-Do-List</Text>
+      <Text style={styles.title}>Tashinga To-Do List</Text>
 
       <View style={styles.inputContainer}>
         <TextInput
