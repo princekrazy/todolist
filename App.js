@@ -14,7 +14,7 @@ export default function App() {
   const removeTask = (id) => {
     setTasks(tasks.filter((item) => item.id !== id));
   };
-t
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Prince To-Do-List</Text>
